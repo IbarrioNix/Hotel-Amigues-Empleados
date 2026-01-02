@@ -162,29 +162,29 @@ class DatabaseManager:
                             ''', (usuario, password))
         return self.cursor.fetchone()
 
-    def agregar_empleado(self, nombre, apellido, turno, telefono='', usuario='', password='', privilegio=''):
+    def agregar_empleado(self, nombre, apellido, puesto, telefono='', usuario='', password='', privilegio=''):
         """Agrega un nuevo empleado"""
         try:
             self.cursor.execute('''
-                                INSERT INTO empleados (nombre, apellido, turno, telefono, usuario, password, privilegio)
+                                INSERT INTO empleados (nombre, apellido, puesto, telefono, usuario, password, privilegio)
                                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                                ''', (nombre, apellido, turno, telefono, usuario, password, privilegio))
+                                ''', (nombre, apellido, puesto, telefono, usuario, password, privilegio))
             self.conn.commit()
             return True
         except sqlite3.IntegrityError:
             return False
 
-    def actualizar_empleado(self, id, nombre, apellido, turno, telefono, privilegio):
+    def actualizar_empleado(self, id, nombre, apellido, puesto, telefono, privilegio):
         """Actualiza un empleado"""
         self.cursor.execute('''
                             UPDATE empleados
                             SET nombre=?,
                                 apellido=?,
                                 privilegio=?,
-                                turno=?,
+                                puesto=?,
                                 telefono=?
                             WHERE id = ?
-                            ''', (nombre, apellido, privilegio, turno, telefono, id))
+                            ''', (nombre, apellido, privilegio, puesto, telefono, id))
         self.conn.commit()
 
     def eliminar_empleado(self, id):

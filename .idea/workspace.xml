@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="Creacion de base de datos y implementacion en login y dashboard">
-      <change beforePath="$PROJECT_DIR$/database/hotel.db" beforeDir="false" afterPath="$PROJECT_DIR$/database/hotel.db" afterDir="false" />
+    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/db_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/db_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/dashboard_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/dashboard_window.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/habitaciones_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/habitaciones_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/empleados_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/empleados_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +81,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767330166426</updated>
-      <workItem from="1767330167438" duration="10995000" />
+      <workItem from="1767330167438" duration="12462000" />
     </task>
     <task id="LOCAL-00001" summary="Commit">
       <option name="closed" value="true" />
@@ -122,7 +123,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767339563367</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion">
+      <option name="closed" value="true" />
+      <created>1767341218952</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767341218952</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -132,11 +141,12 @@
     <MESSAGE value="Commit" />
     <MESSAGE value="Login y dashboard basico" />
     <MESSAGE value="Creacion de base de datos y implementacion en login y dashboard" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creacion de base de datos y implementacion en login y dashboard" />
+    <MESSAGE value="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$habitaciones_window.coverage" NAME="habitaciones_window Coverage Results" MODIFIED="1767341000122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
-    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767341130855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767342512295" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$dashboard_window.coverage" NAME="dashboard_window Coverage Results" MODIFIED="1767333854389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$login_window.coverage" NAME="login_window Coverage Results" MODIFIED="1767332918256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
   </component>
