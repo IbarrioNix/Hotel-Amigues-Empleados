@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-#from gui.habitaciones_window import HabitacionesWindow
+from gui.habitaciones_window import HabitacionesWindow
 from database.db_manager import DatabaseManager
 
 class DashboardWindow:
@@ -115,9 +115,7 @@ class DashboardWindow:
 
     def abrir_habitaciones(self):
         self.limpiar_area_contenido()
-        tk.Label(self.area_contenido, text="Módulo de Empleados",
-                 font=("Arial", 20)).pack(pady=50)
-        #HabitacionesWindow(self.area_contenido)
+        HabitacionesWindow(self.area_contenido)
 
     def abrir_empleados(self):
         self.limpiar_area_contenido()
