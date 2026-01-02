@@ -1,10 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
 #from gui.habitaciones_window import HabitacionesWindow
+from database.db_manager import DatabaseManager
 
 class DashboardWindow:
-    def __init__(self, root):
+    def __init__(self, root, nombre_empleado, apellido_empleado, puesto):
         self.root = root
+        self.nombre_empleado = nombre_empleado
+        self.apellido_empleado = apellido_empleado
+        self.puesto = puesto
+        self.db = DatabaseManager()
+
         self.root.title("Sistema Hotel - Panel Principal")
         self.root.geometry("900x600")
 
@@ -69,16 +75,28 @@ class DashboardWindow:
     def mostrar_inicio(self):
         self.limpiar_area_contenido()
 
+        # Obtener estadisticas de la db
+        stats = self.db.obtener_estadisticas()
+
+        # Info empleado
+        frame_info = tk.Frame(self.area_contenido, bg="#ecf0f1")
+        frame_info.pack(pady=20)
+
+        tk.Label(frame_info,
+                 text=f"Bienvenido: {self.nombre_empleado} {self.apellido_empleado} - {self.puesto}",
+                 font= ("Arial", 14, "bold"),
+                 bg="#ecf0f1",).pack()
+
         # Frame para las tarjetas
         frame_tarjetas = tk.Frame(self.area_contenido, bg="#ecf0f1")
         frame_tarjetas.pack(expand=True)
 
         # Tarjetas de resumen
         tarjetas = [
-            ("Habitaciones\nDisponibles", "25", "#27ae60"),
-            ("Habitaciones\nOcupadas", "15", "#e74c3c"),
-            ("Reservas Hoy", "8", "#3498db"),
-            ("Empleados\nActivos", "12", "#9b59b6")
+            ("Habitaciones\nDisponibles", str(stats['disponibles']), "#27ae60"),
+            ("Habitaciones\nOcupadas", str(stats['ocupadas']), "#e74c3c"),
+            ("En Limpieza", str(stats['limpieza']), "#3498db"),
+            ("Empleados\nActivos", str(stats['empleados']), "#9b59b6")
         ]
 
         for i, (titulo, valor, color) in enumerate(tarjetas):

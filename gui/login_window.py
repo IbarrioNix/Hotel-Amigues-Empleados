@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from gui.dashboard_window import DashboardWindow
+from database.db_manager import DatabaseManager
 
 class LoginWindow:
     def __init__(self, root):
@@ -8,6 +9,9 @@ class LoginWindow:
         self.root.title("Sistema Hotel - Login")
         self.root.geometry("500x500")
         self.root.resizable(False, False)
+
+        #Inicializar db
+        self.db = DatabaseManager()
 
         #Centrar ventana
         self.centrar_ventana()
@@ -43,7 +47,10 @@ class LoginWindow:
         tk.Label(frame, text="Contrasena:", bg="#2c3e50", fg="white", font=("ARIAL", 11)).pack(anchor="w", pady=(10, 5))
         self.entry_password = tk.Entry(frame, font=("ARIAL", 11), width=30, show="*")
         self.entry_password.pack(pady=(0, 20))
-        self.entry_password.insert(0, "royerguapo")  # Contra para pruebas
+        self.entry_password.insert(0, "1234")  # Contra para pruebas
+
+        #Enter para login
+        self.entry_password.bind('<Return>', lambda e: self.validar_login())
 
         #Boton login
         btn_login = tk.Button(frame, text="ACCEDER",
@@ -56,19 +63,26 @@ class LoginWindow:
         btn_login.pack(pady=10)
 
     def validar_login(self):
-        usuario = self.entry_usuario.get()
-        password = self.entry_password.get()
+        usuario = self.entry_usuario.get().strip()
+        password = self.entry_password.get().strip()
 
-        # Validacion simple (conectar a db despuecito)
-        if usuario == "admin" and password == "royerguapo":
+        if not usuario or not password:
+            messagebox.showerror("ADVERTENCIA", "DATOS INCOMPLETOS")
+
+        # Validacion db
+        empleado = self.db.validar_login(usuario, password)
+        if empleado:
+            empleado_id, nombre, apellido, puesto = empleado
+            self.db.cerrar()
             self.root.destroy()
-            self.abrir_dashboard()
+            self.abrir_dashboard(nombre, apellido, puesto)
         else:
             messagebox.showerror("ERROR", "Usuario o contrasena incorretos")
+            self.entry_password.delete(0, tk.END)
 
-    def abrir_dashboard(self):
+    def abrir_dashboard(self, nombre, apellido, puesto):
         root = tk.Tk()
-        DashboardWindow(root)
+        DashboardWindow(root, nombre, apellido, puesto)
         root.mainloop()
 
 

@@ -1,29 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="Commit">
-      <change afterPath="$PROJECT_DIR$/assets/styles.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/empleados_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/habitaciones_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/reservas_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/db_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/dashboard_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/empleados_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/habitaciones_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/login_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui/reservas_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/empleado.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/habitacion.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/huesped.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/reserva.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/constantes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/validaciones.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="Login y dashboard basico">
+      <change beforePath="$PROJECT_DIR$/database/db_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/db_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/dashboard_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/dashboard_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/login_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/login_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,23 +19,29 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="IbarrioNix &lt;marioibarra1003@gmail.com&gt;" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "IbarrioNix"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;IbarrioNix&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/IbarrioNix/Hotel-Amigues-Empleados.git",
-    "accountId": "c7e3f8d8-6353-4321-9383-84cf7a441bf6"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/IbarrioNix/Hotel-Amigues-Empleados.git&quot;,
+    &quot;accountId&quot;: &quot;c7e3f8d8-6353-4321-9383-84cf7a441bf6&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="37ggXMhaYbtZLJfeRQxel9VCqdg" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -67,12 +54,13 @@
     "Python.login_window.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "ai.playground.ignore.import.keys.banner.in.settings": "true",
     "git-widget-placeholder": "master",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -91,7 +79,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767330166426</updated>
-      <workItem from="1767330167438" duration="4456000" />
+      <workItem from="1767330167438" duration="9354000" />
     </task>
     <task id="LOCAL-00001" summary="Commit">
       <option name="closed" value="true" />
@@ -101,7 +89,31 @@
       <option name="project" value="LOCAL" />
       <updated>1767330646622</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Login y dashboard basico">
+      <option name="closed" value="true" />
+      <created>1767334652919</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1767334652919</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Login y dashboard basico">
+      <option name="closed" value="true" />
+      <created>1767334667992</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1767334667992</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Login y dashboard basico">
+      <option name="closed" value="true" />
+      <created>1767335268508</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1767335268508</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,10 +121,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit" />
+    <MESSAGE value="Login y dashboard basico" />
+    <option name="LAST_COMMIT_MESSAGE" value="Login y dashboard basico" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767334282636" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767339170657" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$dashboard_window.coverage" NAME="dashboard_window Coverage Results" MODIFIED="1767333854389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$login_window.coverage" NAME="login_window Coverage Results" MODIFIED="1767332918256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
   </component>
