@@ -1,6 +1,8 @@
-import tkinter as tk
+# gui/empleados_window.py
+import customtkinter as ctk
 from tkinter import ttk, messagebox
 from database.db_manager import DatabaseManager
+
 
 class EmpleadosWindow:
     def __init__(self, parent):
@@ -10,55 +12,86 @@ class EmpleadosWindow:
         self.cargar_empleados()
 
     def crear_widgets(self):
-        # Título
-        titulo = tk.Label(self.parent, text="👥 GESTIÓN DE EMPLEADOS",
-                          font=("Arial", 18, "bold"),
-                          bg="#ecf0f1")
-        titulo.pack(pady=20)
+        # Container principal
+        main_container = ctk.CTkFrame(self.parent, fg_color="transparent")
+        main_container.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Header
+        header = ctk.CTkFrame(main_container, fg_color="transparent")
+        header.pack(fill="x", pady=(0, 20))
+
+        ctk.CTkLabel(header,
+                     text="👥 Gestión de Empleados",
+                     font=("Segoe UI", 24, "bold")).pack(anchor="w")
 
         # Frame para botones
-        frame_botones = tk.Frame(self.parent, bg="#ecf0f1")
-        frame_botones.pack(pady=10)
+        frame_botones = ctk.CTkFrame(main_container, fg_color="transparent")
+        frame_botones.pack(fill="x", pady=(0, 15))
 
-        btn_agregar = tk.Button(frame_botones, text="➕ Agregar Empleado",
-                                command=self.abrir_formulario_agregar,
-                                bg="#27ae60", fg="white",
-                                font=("Arial", 10, "bold"),
-                                width=18, height=2,
-                                cursor="hand2")
-        btn_agregar.grid(row=0, column=0, padx=5)
+        btn_agregar = ctk.CTkButton(frame_botones,
+                                    text="➕ Agregar Empleado",
+                                    command=self.abrir_formulario_agregar,
+                                    font=("Segoe UI", 12, "bold"),
+                                    height=40,
+                                    corner_radius=10,
+                                    fg_color="#27ae60",
+                                    hover_color="#229954")
+        btn_agregar.pack(side="left", padx=(0, 10))
 
-        btn_editar = tk.Button(frame_botones, text="✏ Editar",
-                               command=self.abrir_formulario_editar,
-                               bg="#3498db", fg="white",
-                               font=("Arial", 10, "bold"),
-                               width=15, height=2,
-                               cursor="hand2")
-        btn_editar.grid(row=0, column=1, padx=5)
+        btn_editar = ctk.CTkButton(frame_botones,
+                                   text="✏️ Editar",
+                                   command=self.abrir_formulario_editar,
+                                   font=("Segoe UI", 12, "bold"),
+                                   height=40,
+                                   corner_radius=10,
+                                   fg_color="#3498db",
+                                   hover_color="#2980b9")
+        btn_editar.pack(side="left", padx=(0, 10))
 
-        btn_eliminar = tk.Button(frame_botones, text="🗑️ Eliminar",
-                                 command=self.eliminar_empleado,
-                                 bg="#e74c3c", fg="white",
-                                 font=("Arial", 10, "bold"),
-                                 width=15, height=2,
-                                 cursor="hand2")
-        btn_eliminar.grid(row=0, column=2, padx=5)
+        btn_eliminar = ctk.CTkButton(frame_botones,
+                                     text="🗑️ Eliminar",
+                                     command=self.eliminar_empleado,
+                                     font=("Segoe UI", 12, "bold"),
+                                     height=40,
+                                     corner_radius=10,
+                                     fg_color="#e74c3c",
+                                     hover_color="#c0392b")
+        btn_eliminar.pack(side="left", padx=(0, 10))
 
-        btn_refrescar = tk.Button(frame_botones, text="🔄 Refrescar",
-                                  command=self.cargar_empleados,
-                                  bg="#95a5a6", fg="white",
-                                  font=("Arial", 10, "bold"),
-                                  width=15, height=2,
-                                  cursor="hand2")
-        btn_refrescar.grid(row=0, column=3, padx=5)
+        btn_refrescar = ctk.CTkButton(frame_botones,
+                                      text="🔄 Refrescar",
+                                      command=self.cargar_empleados,
+                                      font=("Segoe UI", 12, "bold"),
+                                      height=40,
+                                      corner_radius=10,
+                                      fg_color="#95a5a6",
+                                      hover_color="#7f8c8d")
+        btn_refrescar.pack(side="left")
 
         # Frame para la tabla
-        frame_tabla = tk.Frame(self.parent, bg="#ecf0f1")
-        frame_tabla.pack(pady=20, padx=20, fill="both", expand=True)
+        frame_tabla = ctk.CTkFrame(main_container)
+        frame_tabla.pack(fill="both", expand=True)
 
         # Scrollbar
         scrollbar = ttk.Scrollbar(frame_tabla)
         scrollbar.pack(side="right", fill="y")
+
+        # Estilo para Treeview
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview",
+                        background="#2b2b2b",
+                        foreground="white",
+                        fieldbackground="#2b2b2b",
+                        borderwidth=0,
+                        font=("Segoe UI", 10))
+        style.configure("Treeview.Heading",
+                        background="#1f538d",
+                        foreground="white",
+                        borderwidth=0,
+                        font=("Segoe UI", 11, "bold"))
+        style.map("Treeview",
+                  background=[("selected", "#3498db")])
 
         # Treeview (tabla)
         self.tabla = ttk.Treeview(frame_tabla,
@@ -85,7 +118,7 @@ class EmpleadosWindow:
         self.tabla.column("usuario", width=100, anchor="center")
         self.tabla.column("privilegio", width=120, anchor="center")
 
-        self.tabla.pack(fill="both", expand=True)
+        self.tabla.pack(fill="both", expand=True, padx=2, pady=2)
 
         # Evento de doble click para editar
         self.tabla.bind('<Double-1>', lambda e: self.abrir_formulario_editar())
@@ -101,6 +134,7 @@ class EmpleadosWindow:
 
         # Insertar en la tabla (sin mostrar la contraseña)
         for emp in empleados:
+            # emp = (id, nombre, apellido, puesto, telefono, usuario, password, privilegio)
             datos_mostrar = (emp[0], emp[1], emp[2], emp[3], emp[4], emp[5], emp[7])
             self.tabla.insert("", "end", values=datos_mostrar)
 
@@ -120,10 +154,8 @@ class EmpleadosWindow:
         item = self.tabla.item(seleccion[0])
         datos_tabla = item['values']
 
-        # Necesitamos obtener el empleado completo de la BD (incluyendo password)
+        # Buscar empleado completo en la BD
         empleado_id = datos_tabla[0]
-
-        # Buscar en la lista completa de empleados
         empleados = self.db.obtener_empleados()
         empleado_completo = None
 
@@ -168,22 +200,20 @@ class EmpleadosWindow:
 
 class FormularioEmpleado:
     def __init__(self, parent, db, callback_refrescar, datos=None):
-        """
-        parent: Ventana padre
-        db: Instancia de DatabaseManager
-        callback_refrescar: Función para refrescar la tabla
-        datos: Si viene con datos, es para EDITAR, si no, es para AGREGAR
-        """
         self.db = db
         self.callback_refrescar = callback_refrescar
         self.datos = datos
 
         # Crear ventana emergente
-        self.ventana = tk.Toplevel(parent)
+        from tkinter import Toplevel
+        self.ventana = Toplevel(parent)
         self.ventana.title("Agregar Empleado" if not datos else "Editar Empleado")
-        self.ventana.geometry("450x600")
+        self.ventana.geometry("550x700")
         self.ventana.resizable(False, False)
-        #self.ventana.grab_set() NO FUNCIONAL
+        #self.ventana.grab_set()
+
+        # Aplicar tema oscuro
+        self.ventana.configure(bg="#2b2b2b")
 
         # Centrar ventana
         self.centrar_ventana()
@@ -200,86 +230,128 @@ class FormularioEmpleado:
         self.ventana.geometry(f'{width}x{height}+{x}+{y}')
 
     def crear_formulario(self):
-        # Frame principal con scrollbar
-        canvas = tk.Canvas(self.ventana, bg="#ecf0f1")
-        scrollbar = tk.Scrollbar(self.ventana, orient="vertical", command=canvas.yview)
-        frame = tk.Frame(canvas, bg="#ecf0f1", padx=30, pady=30)
-
-        frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
-        canvas.create_window((0, 0), window=frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        # Frame principal con scroll
+        main_frame = ctk.CTkScrollableFrame(self.ventana, corner_radius=15)
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         # Título
         titulo = "AGREGAR EMPLEADO" if not self.datos else "EDITAR EMPLEADO"
-        tk.Label(frame, text=titulo,
-                 font=("Arial", 14, "bold"),
-                 bg="#ecf0f1").pack(pady=20)
+        ctk.CTkLabel(main_frame,
+                     text=titulo,
+                     font=("Segoe UI", 18, "bold")).pack(pady=(10, 25))
 
-        # Campo: Nombre
-        tk.Label(frame, text="Nombre:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.entry_nombre = tk.Entry(frame, font=("Arial", 11), width=35)
-        self.entry_nombre.pack(pady=(0, 10))
+        # DATOS PERSONALES
+        ctk.CTkLabel(main_frame,
+                     text="DATOS PERSONALES",
+                     font=("Segoe UI", 13, "bold"),
+                     text_color="#3498db").pack(anchor="w", padx=20, pady=(10, 15))
 
-        # Campo: Apellido
-        tk.Label(frame, text="Apellido:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.entry_apellido = tk.Entry(frame, font=("Arial", 11), width=35)
-        self.entry_apellido.pack(pady=(0, 10))
+        # Nombre
+        ctk.CTkLabel(main_frame,
+                     text="Nombre",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
 
-        # Campo: Puesto
-        tk.Label(frame, text="Puesto:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.combo_puesto = ttk.Combobox(frame,
-                                         values=["Gerente", "Recepcionista", "Limpieza",
-                                                 "Mantenimiento", "Seguridad", "Cocina"],
-                                         font=("Arial", 11),
-                                         width=33,
-                                         state="readonly")
-        self.combo_puesto.pack(pady=(0, 10))
+        self.entry_nombre = ctk.CTkEntry(main_frame,
+                                         placeholder_text="Ej: Juan",
+                                         height=40,
+                                         font=("Segoe UI", 12),
+                                         corner_radius=10)
+        self.entry_nombre.pack(fill="x", padx=20, pady=(0, 12))
+
+        # Apellido
+        ctk.CTkLabel(main_frame,
+                     text="Apellido",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
+
+        self.entry_apellido = ctk.CTkEntry(main_frame,
+                                           placeholder_text="Ej: Pérez",
+                                           height=40,
+                                           font=("Segoe UI", 12),
+                                           corner_radius=10)
+        self.entry_apellido.pack(fill="x", padx=20, pady=(0, 12))
+
+        # Puesto
+        ctk.CTkLabel(main_frame,
+                     text="Puesto",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
+
+        self.combo_puesto = ctk.CTkComboBox(main_frame,
+                                            values=["Gerente", "Recepcionista", "Limpieza",
+                                                    "Mantenimiento", "Seguridad", "Cocina"],
+                                            height=40,
+                                            font=("Segoe UI", 12),
+                                            corner_radius=10,
+                                            button_color="#3498db",
+                                            button_hover_color="#2980b9")
+        self.combo_puesto.pack(fill="x", padx=20, pady=(0, 12))
         self.combo_puesto.set("Recepcionista")
 
-        # Campo: Teléfono
-        tk.Label(frame, text="Teléfono:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.entry_telefono = tk.Entry(frame, font=("Arial", 11), width=35)
-        self.entry_telefono.pack(pady=(0, 10))
+        # Teléfono
+        ctk.CTkLabel(main_frame,
+                     text="Teléfono",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
+
+        self.entry_telefono = ctk.CTkEntry(main_frame,
+                                           placeholder_text="Ej: 1234567890",
+                                           height=40,
+                                           font=("Segoe UI", 12),
+                                           corner_radius=10)
+        self.entry_telefono.pack(fill="x", padx=20, pady=(0, 20))
 
         # Separador
-        ttk.Separator(frame, orient='horizontal').pack(fill='x', pady=20)
+        ctk.CTkFrame(main_frame, height=2, fg_color=("gray70", "gray30")).pack(fill="x", padx=20, pady=15)
 
-        tk.Label(frame, text="DATOS DE ACCESO AL SISTEMA",
-                 font=("Arial", 11, "bold"),
-                 bg="#ecf0f1", fg="#34495e").pack(pady=10)
+        # DATOS DE ACCESO
+        ctk.CTkLabel(main_frame,
+                     text="DATOS DE ACCESO AL SISTEMA",
+                     font=("Segoe UI", 13, "bold"),
+                     text_color="#e74c3c").pack(anchor="w", padx=20, pady=(10, 15))
 
-        # Campo: Usuario
-        tk.Label(frame, text="Usuario:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.entry_usuario = tk.Entry(frame, font=("Arial", 11), width=35)
-        self.entry_usuario.pack(pady=(0, 10))
+        # Usuario
+        ctk.CTkLabel(main_frame,
+                     text="Usuario",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
 
-        # Campo: Contraseña
-        tk.Label(frame, text="Contraseña:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.entry_password = tk.Entry(frame, font=("Arial", 11), width=35, show="*")
-        self.entry_password.pack(pady=(0, 10))
+        self.entry_usuario = ctk.CTkEntry(main_frame,
+                                          placeholder_text="Nombre de usuario único",
+                                          height=40,
+                                          font=("Segoe UI", 12),
+                                          corner_radius=10)
+        self.entry_usuario.pack(fill="x", padx=20, pady=(0, 12))
 
-        # Campo: Privilegio
-        tk.Label(frame, text="Privilegio:",
-                 bg="#ecf0f1", font=("Arial", 10)).pack(anchor="w", pady=(10, 5))
-        self.combo_privilegio = ttk.Combobox(frame,
-                                             values=["Administrador", "Empleado"],
-                                             font=("Arial", 11),
-                                             width=33,
-                                             state="readonly")
-        self.combo_privilegio.pack(pady=(0, 20))
+        # Contraseña
+        ctk.CTkLabel(main_frame,
+                     text="Contraseña",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
+
+        self.entry_password = ctk.CTkEntry(main_frame,
+                                           placeholder_text="Mínimo 4 caracteres",
+                                           height=40,
+                                           font=("Segoe UI", 12),
+                                           show="•",
+                                           corner_radius=10)
+        self.entry_password.pack(fill="x", padx=20, pady=(0, 12))
+
+        # Privilegio
+        ctk.CTkLabel(main_frame,
+                     text="Nivel de Privilegio",
+                     font=("Segoe UI", 11),
+                     anchor="w").pack(anchor="w", padx=20, pady=(0, 5))
+
+        self.combo_privilegio = ctk.CTkComboBox(main_frame,
+                                                values=["Administrador", "Empleado"],
+                                                height=40,
+                                                font=("Segoe UI", 12),
+                                                corner_radius=10,
+                                                button_color="#3498db",
+                                                button_hover_color="#2980b9")
+        self.combo_privilegio.pack(fill="x", padx=20, pady=(0, 25))
         self.combo_privilegio.set("Empleado")
 
         # Si hay datos (modo editar), rellenar campos
@@ -293,31 +365,37 @@ class FormularioEmpleado:
             self.entry_password.insert(0, self.datos[6] if self.datos[6] else "")
             self.combo_privilegio.set(self.datos[7] if self.datos[7] else "Empleado")
 
-            # Si es el admin, deshabilitar cambio de privilegio
+            # Si es el admin, deshabilitar privilegio
             if self.datos[0] == 1:
-                self.combo_privilegio.config(state="disabled")
+                self.combo_privilegio.configure(state="disabled")
 
         # Frame para botones
-        frame_botones = tk.Frame(frame, bg="#ecf0f1")
-        frame_botones.pack(pady=20)
+        frame_botones = ctk.CTkFrame(main_frame, fg_color="transparent")
+        frame_botones.pack(pady=(10, 15))
 
         # Botón Guardar
-        btn_guardar = tk.Button(frame_botones, text="💾 Guardar",
-                                command=self.guardar,
-                                bg="#27ae60", fg="white",
-                                font=("Arial", 11, "bold"),
-                                width=12, height=2,
-                                cursor="hand2")
-        btn_guardar.grid(row=0, column=0, padx=5)
+        btn_guardar = ctk.CTkButton(frame_botones,
+                                    text="💾 Guardar",
+                                    command=self.guardar,
+                                    width=180,
+                                    height=45,
+                                    font=("Segoe UI", 13, "bold"),
+                                    corner_radius=10,
+                                    fg_color="#27ae60",
+                                    hover_color="#229954")
+        btn_guardar.pack(side="left", padx=5)
 
         # Botón Cancelar
-        btn_cancelar = tk.Button(frame_botones, text="❌ Cancelar",
-                                 command=self.ventana.destroy,
-                                 bg="#e74c3c", fg="white",
-                                 font=("Arial", 11, "bold"),
-                                 width=12, height=2,
-                                 cursor="hand2")
-        btn_cancelar.grid(row=0, column=1, padx=5)
+        btn_cancelar = ctk.CTkButton(frame_botones,
+                                     text="❌ Cancelar",
+                                     command=self.ventana.destroy,
+                                     width=180,
+                                     height=45,
+                                     font=("Segoe UI", 13, "bold"),
+                                     corner_radius=10,
+                                     fg_color="#e74c3c",
+                                     hover_color="#c0392b")
+        btn_cancelar.pack(side="left", padx=5)
 
     def guardar(self):
         """Guarda o actualiza el empleado"""
@@ -347,16 +425,8 @@ class FormularioEmpleado:
         # Guardar en base de datos
         if self.datos:  # EDITAR
             empleado_id = self.datos[0]
-
-            # Si cambió el usuario o password, actualizar también
-            if usuario != self.datos[5] or password != self.datos[6]:
-                # Actualizar con nuevos datos de acceso
-                exito = self.db.actualizar_empleado(empleado_id, nombre, apellido,
-                                                    puesto, telefono, privilegio)
-            else:
-                # Actualizar solo datos básicos
-                exito = self.db.actualizar_empleado(empleado_id, nombre, apellido,
-                                                    puesto, telefono, privilegio)
+            exito = self.db.actualizar_empleado(empleado_id, nombre, apellido,
+                                                puesto, telefono, privilegio)
 
             if exito:
                 messagebox.showinfo("Éxito", "Empleado actualizado correctamente")
@@ -367,7 +437,7 @@ class FormularioEmpleado:
 
         else:  # AGREGAR
             if not usuario or not password:
-                messagebox.showerror("Error", "Usuario y contraseña son obligatorios para nuevos empleados")
+                messagebox.showerror("Error", "Usuario y contraseña son obligatorios")
                 return
 
             exito = self.db.agregar_empleado(nombre, apellido, puesto, telefono,

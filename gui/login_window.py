@@ -1,25 +1,51 @@
-import tkinter as tk
+# gui/login_window.py
+import customtkinter as ctk
 from tkinter import messagebox
 from gui.dashboard_window import DashboardWindow
 from database.db_manager import DatabaseManager
+from typing import Optional, Tuple
+from PIL import Image, ImageDraw
+import io
+
+# Configuración de tema
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
 
 class LoginWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Sistema Hotel - Login")
-        self.root.geometry("500x500")
+        self.root.geometry("1000x650")
         self.root.resizable(False, False)
 
-        #Inicializar db
-        self.db = DatabaseManager()
+        # Variables
+        self.db: Optional[DatabaseManager] = None
+        self.intentos_fallidos = 0
+        self.max_intentos = 3
+        self.password_visible = False
 
-        #Centrar ventana
-        self.centrar_ventana()
+        # Inicializar
+        self._inicializar_db()
+        self._centrar_ventana()
+        self._crear_widgets()
 
-        #Crear widgets
-        self.crear_widgets()
+        # Focus inicial
+        self.entry_usuario.focus()
 
-    def centrar_ventana(self):
+    def _inicializar_db(self):
+        """Inicializa la conexión a la base de datos con manejo de errores"""
+        try:
+            self.db = DatabaseManager()
+        except Exception as e:
+            messagebox.showerror(
+                "Error de Conexión",
+                f"No se pudo conectar a la base de datos:\n{str(e)}"
+            )
+            self.root.destroy()
+
+    def _centrar_ventana(self):
+        """Centra la ventana en la pantalla"""
         self.root.update_idletasks()
         width = self.root.winfo_width()
         height = self.root.winfo_height()
@@ -27,62 +53,371 @@ class LoginWindow:
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f'{width}x{height}+{x}+{y}')
 
-    def crear_widgets(self):
+    def _crear_widgets(self):
+        """Crea todos los widgets de la interfaz"""
+        # Container principal
+        container = ctk.CTkFrame(self.root, fg_color="transparent")
+        container.pack(fill="both", expand=True)
 
-        #Frame principal
-        frame = tk.Frame(self.root, bg="#2c3e50", padx=30, pady=30)
-        frame.pack(fill="both", expand=True)
+        # Panel izquierdo - Imagen/Branding
+        panel_izq = ctk.CTkFrame(container, fg_color=("#2C3E50", "#1a252f"), corner_radius=0)
+        panel_izq.pack(side="left", fill="both", expand=True)
 
-        #Titulo
-        titulo = tk.Label(frame, text="🏨 SISTEMA HOTELERO", font = ("ARIAL",12, "bold"), bg="#2c3e50", fg="white")
-        titulo.pack(pady=20)
+        self._crear_panel_branding(panel_izq)
 
-        #Usuario
-        tk.Label(frame, text="Usuario:", bg="#2c3e50", fg="white", font= ("ARIAL",11)).pack(anchor="w", pady=(10, 5))
-        self.entry_usuario = tk.Entry(frame, font= ("ARIAL",11), width= 30)
-        self.entry_usuario.pack(pady=(0, 10))
-        self.entry_usuario.insert(0,"admin") #Usuario para pruebas
+        # Panel derecho - Formulario
+        panel_der = ctk.CTkFrame(container, fg_color=("#ECF0F1", "#2b2b2b"), corner_radius=0, width=450)
+        panel_der.pack(side="right", fill="both", padx=0, pady=0)
+        panel_der.pack_propagate(False)
 
-        #Contrasena
-        tk.Label(frame, text="Contrasena:", bg="#2c3e50", fg="white", font=("ARIAL", 11)).pack(anchor="w", pady=(10, 5))
-        self.entry_password = tk.Entry(frame, font=("ARIAL", 11), width=30, show="*")
-        self.entry_password.pack(pady=(0, 20))
-        self.entry_password.insert(0, "1234")  # Contra para pruebas
+        self._crear_panel_login(panel_der)
 
-        #Enter para login
+    def _crear_panel_branding(self, parent):
+        """Crea el panel de branding con diseño atractivo"""
+        # Container centrado
+        content = ctk.CTkFrame(parent, fg_color="transparent")
+        content.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Icono grande del hotel
+        icon_label = ctk.CTkLabel(
+            content,
+            text="🏨",
+            font=("Segoe UI", 120),
+        )
+        icon_label.pack(pady=(0, 30))
+
+        # Título principal
+        titulo = ctk.CTkLabel(
+            content,
+            text="HOTEL AMIGUES",
+            font=("Segoe UI", 42, "bold"),
+            text_color=("#ECF0F1", "#ECF0F1")
+        )
+        titulo.pack(pady=(0, 15))
+
+        # Línea decorativa
+        linea = ctk.CTkFrame(content, height=3, width=200, fg_color=("#3498DB", "#3498DB"))
+        linea.pack(pady=(0, 15))
+
+        # Subtítulo
+        subtitulo = ctk.CTkLabel(
+            content,
+            text="Sistema de Gestión Hotelera",
+            font=("Segoe UI", 18),
+            text_color=("#BDC3C7", "#BDC3C7")
+        )
+        subtitulo.pack(pady=(0, 50))
+
+        # Features
+        features = [
+            "✓ Gestión de Reservas",
+            "✓ Control de Habitaciones",
+            "✓ Administración de Personal",
+            "✓ Reportes en Tiempo Real"
+        ]
+
+        for feature in features:
+            feature_label = ctk.CTkLabel(
+                content,
+                text=feature,
+                font=("Segoe UI", 14),
+                text_color=("#95A5A6", "#95A5A6"),
+                anchor="w"
+            )
+            feature_label.pack(pady=5, anchor="w", padx=20)
+
+    def _crear_panel_login(self, parent):
+        """Crea el panel de login con diseño moderno"""
+        # Container del formulario
+        form_container = ctk.CTkFrame(parent, fg_color="transparent")
+        form_container.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Header del formulario
+        header = ctk.CTkLabel(
+            form_container,
+            text="Iniciar Sesión",
+            font=("Segoe UI", 32, "bold"),
+            text_color=("#2C3E50", "#ECF0F1")
+        )
+        header.pack(pady=(0, 10))
+
+        subheader = ctk.CTkLabel(
+            form_container,
+            text="Ingresa tus credenciales para continuar",
+            font=("Segoe UI", 12),
+            text_color=("#7F8C8D", "#95A5A6")
+        )
+        subheader.pack(pady=(0, 40))
+
+        # Campo Usuario
+        self._crear_campo_usuario(form_container)
+
+        # Campo Contraseña
+        self._crear_campo_password(form_container)
+
+        # Checkbox recordar
+        self.check_recordar = ctk.CTkCheckBox(
+            form_container,
+            text="Recordar mi usuario",
+            font=("Segoe UI", 11),
+            checkbox_width=20,
+            checkbox_height=20,
+            corner_radius=5
+        )
+        self.check_recordar.pack(pady=(10, 25), anchor="w", padx=5)
+
+        # Botón Ingresar
+        self.btn_login = ctk.CTkButton(
+            form_container,
+            text="INGRESAR",
+            width=350,
+            height=50,
+            font=("Segoe UI", 15, "bold"),
+            corner_radius=12,
+            fg_color=("#27AE60", "#27AE60"),
+            hover_color=("#229954", "#229954"),
+            command=self.validar_login
+        )
+        self.btn_login.pack(pady=(0, 15))
+
+        # Botón Limpiar
+        btn_limpiar = ctk.CTkButton(
+            form_container,
+            text="Limpiar campos",
+            width=350,
+            height=40,
+            font=("Segoe UI", 12),
+            corner_radius=12,
+            fg_color="transparent",
+            border_width=2,
+            border_color=("#BDC3C7", "#4A4A4A"),
+            text_color=("#7F8C8D", "#95A5A6"),
+            hover_color=("#ECF0F1", "#3A3A3A"),
+            command=self._limpiar_campos
+        )
+        btn_limpiar.pack(pady=(0, 30))
+
+        # Footer
+        footer_frame = ctk.CTkFrame(form_container, fg_color="transparent")
+        footer_frame.pack(pady=(20, 0))
+
+        # Botón cambiar tema
+        btn_tema = ctk.CTkButton(
+            footer_frame,
+            text="🌓",
+            width=40,
+            height=40,
+            font=("Segoe UI", 18),
+            corner_radius=20,
+            fg_color="transparent",
+            border_width=2,
+            border_color=("#BDC3C7", "#4A4A4A"),
+            hover_color=("#ECF0F1", "#3A3A3A"),
+            command=self._toggle_theme
+        )
+        btn_tema.pack(side="left", padx=5)
+
+        # Info adicional
+        info_label = ctk.CTkLabel(
+            footer_frame,
+            text="¿Problemas para ingresar? Contacta al administrador",
+            font=("Segoe UI", 9),
+            text_color=("#95A5A6", "#7F8C8D")
+        )
+        info_label.pack(side="left", padx=10)
+
+    def _crear_campo_usuario(self, parent):
+        """Crea el campo de usuario con diseño mejorado"""
+        label_usuario = ctk.CTkLabel(
+            parent,
+            text="Usuario",
+            font=("Segoe UI", 13, "bold"),
+            text_color=("#2C3E50", "#ECF0F1"),
+            anchor="w"
+        )
+        label_usuario.pack(anchor="w", pady=(0, 8))
+
+        self.entry_usuario = ctk.CTkEntry(
+            parent,
+            placeholder_text="Ingresa tu nombre de usuario",
+            width=350,
+            height=50,
+            font=("Segoe UI", 13),
+            corner_radius=12,
+            border_width=2,
+            border_color=("#BDC3C7", "#4A4A4A")
+        )
+        self.entry_usuario.pack(pady=(0, 20))
+
+    def _crear_campo_password(self, parent):
+        """Crea el campo de contraseña con botón mostrar/ocultar"""
+        label_password = ctk.CTkLabel(
+            parent,
+            text="Contraseña",
+            font=("Segoe UI", 13, "bold"),
+            text_color=("#2C3E50", "#ECF0F1"),
+            anchor="w"
+        )
+        label_password.pack(anchor="w", pady=(0, 8))
+
+        # Frame contenedor
+        password_frame = ctk.CTkFrame(parent, fg_color="transparent")
+        password_frame.pack(pady=(0, 5))
+
+        self.entry_password = ctk.CTkEntry(
+            password_frame,
+            placeholder_text="Ingresa tu contraseña",
+            width=295,
+            height=50,
+            font=("Segoe UI", 13),
+            show="•",
+            corner_radius=12,
+            border_width=2,
+            border_color=("#BDC3C7", "#4A4A4A")
+        )
+        self.entry_password.pack(side="left", padx=(0, 5))
         self.entry_password.bind('<Return>', lambda e: self.validar_login())
 
-        #Boton login
-        btn_login = tk.Button(frame, text="ACCEDER",
-                              command=self.validar_login,
-                              bg="#27ae60", fg="white",
-                              font= ("ARIAL", 12, "bold"),
-                              width=20, height=2,
-                              cursor="hand2"
-                              )
-        btn_login.pack(pady=10)
+        # Botón mostrar/ocultar
+        self.btn_mostrar = ctk.CTkButton(
+            password_frame,
+            text="👁",
+            width=50,
+            height=50,
+            font=("Segoe UI", 18),
+            corner_radius=12,
+            fg_color="transparent",
+            border_width=2,
+            border_color=("#BDC3C7", "#4A4A4A"),
+            hover_color=("#ECF0F1", "#3A3A3A"),
+            command=self._toggle_password_visibility
+        )
+        self.btn_mostrar.pack(side="left")
 
-    def validar_login(self):
+    def _toggle_password_visibility(self):
+        """Alterna la visibilidad de la contraseña"""
+        if self.entry_password.cget("show") == "•":
+            self.entry_password.configure(show="")
+            self.btn_mostrar.configure(text="🙈")
+        else:
+            self.entry_password.configure(show="•")
+            self.btn_mostrar.configure(text="👁")
+
+    def _toggle_theme(self):
+        """Cambia entre modo oscuro y claro"""
+        nuevo_modo = "light" if ctk.get_appearance_mode() == "Dark" else "dark"
+        ctk.set_appearance_mode(nuevo_modo)
+
+    def _limpiar_campos(self):
+        """Limpia los campos de entrada"""
+        self.entry_usuario.delete(0, 'end')
+        self.entry_password.delete(0, 'end')
+        self.entry_usuario.focus()
+
+    def _validar_campos(self) -> Tuple[bool, str, str]:
+        """Valida los campos de entrada"""
         usuario = self.entry_usuario.get().strip()
         password = self.entry_password.get().strip()
 
-        if not usuario or not password:
-            messagebox.showerror("ADVERTENCIA", "DATOS INCOMPLETOS")
+        if not usuario:
+            messagebox.showwarning("Advertencia", "Por favor ingrese su usuario")
+            self.entry_usuario.focus()
+            return False, "", ""
 
-        # Validacion db
-        empleado = self.db.validar_login(usuario, password)
-        if empleado:
-            empleado_id, nombre, apellido, puesto = empleado
+        if not password:
+            messagebox.showwarning("Advertencia", "Por favor ingrese su contraseña")
+            self.entry_password.focus()
+            return False, "", ""
+
+        if len(usuario) < 3:
+            messagebox.showwarning("Advertencia", "El usuario debe tener al menos 3 caracteres")
+            return False, "", ""
+
+        return True, usuario, password
+
+    def _bloquear_login(self):
+        """Bloquea temporalmente el login"""
+        self.btn_login.configure(
+            state="disabled",
+            text="BLOQUEADO",
+            fg_color=("#E74C3C", "#C0392B")
+        )
+        messagebox.showerror(
+            "Cuenta Bloqueada",
+            "Demasiados intentos fallidos.\nPor favor contacte al administrador."
+        )
+
+    def validar_login(self):
+        """Valida las credenciales del usuario"""
+        es_valido, usuario, password = self._validar_campos()
+        if not es_valido:
+            return
+
+        if self.intentos_fallidos >= self.max_intentos:
+            self._bloquear_login()
+            return
+
+        try:
+            empleado = self.db.validar_login(usuario, password)
+
+            if empleado:
+                self._login_exitoso(empleado)
+            else:
+                self._login_fallido()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al validar credenciales:\n{str(e)}")
+
+    def _login_exitoso(self, empleado):
+        """Maneja un login exitoso"""
+        empleado_id, nombre, apellido, puesto = empleado
+        privilegio = self._obtener_privilegio(empleado_id)
+
+        if self.db:
             self.db.cerrar()
-            self.root.destroy()
-            self.abrir_dashboard(nombre, apellido, puesto)
+
+        self.root.destroy()
+        self._abrir_dashboard(nombre, apellido, puesto, privilegio)
+
+    def _login_fallido(self):
+        """Maneja un login fallido"""
+        self.intentos_fallidos += 1
+        intentos_restantes = self.max_intentos - self.intentos_fallidos
+
+        if intentos_restantes > 0:
+            messagebox.showerror(
+                "Error de Autenticación",
+                f"Usuario o contraseña incorrectos.\nIntentos restantes: {intentos_restantes}"
+            )
+            self.entry_password.delete(0, 'end')
+            self.entry_password.focus()
         else:
-            messagebox.showerror("ERROR", "Usuario o contrasena incorretos")
-            self.entry_password.delete(0, tk.END)
+            self._bloquear_login()
 
-    def abrir_dashboard(self, nombre, apellido, puesto):
-        root = tk.Tk()
-        DashboardWindow(root, nombre, apellido, puesto)
-        root.mainloop()
+    def _obtener_privilegio(self, empleado_id: int) -> str:
+        """Obtiene el privilegio del empleado"""
+        try:
+            empleados = self.db.obtener_empleados()
+            for emp in empleados:
+                if emp[0] == empleado_id:
+                    return emp[7] if emp[7] else "Administrador"
+            return "Administrador"
+        except Exception:
+            return "Administrador"
 
+    def _abrir_dashboard(self, nombre: str, apellido: str, puesto: str, privilegio: str):
+        """Abre la ventana del dashboard"""
+        try:
+            root = ctk.CTk()
+            DashboardWindow(root, nombre, apellido, puesto, privilegio)
+            root.mainloop()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo abrir el dashboard:\n{str(e)}")
 
+    def __del__(self):
+        """Destructor para cerrar la conexión a la BD"""
+        if self.db:
+            try:
+                self.db.cerrar()
+            except Exception:
+                pass

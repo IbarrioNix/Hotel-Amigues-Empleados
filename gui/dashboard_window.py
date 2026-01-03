@@ -1,141 +1,684 @@
-import tkinter as tk
-from tkinter import ttk
+# gui/dashboard_window.py
+import customtkinter as ctk
+from tkinter import messagebox
 from gui.habitaciones_window import HabitacionesWindow
 from gui.empleados_window import EmpleadosWindow
+from gui.reservas_window import ReservasWindow
+from gui.huespedes_window import HuespedesWindow
 from database.db_manager import DatabaseManager
+from typing import Optional
+
 
 class DashboardWindow:
-    def __init__(self, root, nombre_empleado, apellido_empleado, puesto):
+    def __init__(self, root, nombre_empleado, apellido_empleado, puesto, privilegio):
         self.root = root
         self.nombre_empleado = nombre_empleado
         self.apellido_empleado = apellido_empleado
         self.puesto = puesto
+        self.privilegio = privilegio
+
+        # Base de datos
         self.db = DatabaseManager()
 
-        self.root.title("Sistema Hotel - Panel Principal")
-        self.root.geometry("900x600")
+        # Configuración de ventana
+        self.root.title("Sistema Hotel Amigues - Dashboard")
+        self.root.geometry("1400x800")
 
-        #Maximizar ventana
-        #self.root.state('zoomed') #Windows
-        #self.root.attributes('-zoomed', True) #Linuxgod
+        # Variables
+        self.boton_activo = None
 
-        self.crear_widgets()
+        # Colores del tema
+        self.COLORES = {
+            'sidebar': ("#2C3E50", "#1a252f"),
+            'sidebar_hover': ("#34495E", "#243342"),
+            'sidebar_active': ("#3498DB", "#2980B9"),
+            'content_bg': ("#ECF0F1", "#2b2b2b"),
+            'card_bg': ("#FFFFFF", "#3a3a3a"),
+            'primary': "#3498DB",
+            'success': "#27AE60",
+            'warning': "#F39C12",
+            'danger': "#E74C3C",
+            'info': "#3498DB",
+        }
 
-    def crear_widgets(self):
-
-        #Barra superior
-        barra_superior = tk.Frame(self.root, bg= "#34495e", height=400, width=60)
-        barra_superior.pack(side="top", fill="x")
-
-        titulo = tk.Label(barra_superior, text= "🏨 SISTEMA DE GESTIÓN HOTELERA",
-                          font=("Arial", 18, "bold"),
-                          bg="#34495e", fg="white")
-        titulo.pack(pady=15)
-
-        # Frame principal con dos columnas
-        frame_principal = tk.Frame(self.root)
-        frame_principal.pack(fill="both", expand=True)
-
-        # Panel lateral (menú)
-        self.panel_lateral = tk.Frame(frame_principal, bg="#2c3e50", width=200)
-        self.panel_lateral.pack(side="left", fill="y")
-
-        # Área de contenido
-        self.area_contenido = tk.Frame(frame_principal, bg="#ecf0f1")
-        self.area_contenido.pack(side="right", fill="both", expand=True)
-
-        self.crear_menu()
+        self._crear_interfaz()
         self.mostrar_inicio()
 
-    def crear_menu(self):
-        botones = [
-            ("🏠 Inicio", self.mostrar_inicio),
-            ("🛏 Habitaciones", self.abrir_habitaciones),
-            ("👥 Empleados", self.abrir_empleados),
-            ("📅 Reservas", self.abrir_reservas),
-            ("🔧 Mantenimiento", self.abrir_mantenimiento),
-            ("📊 Reportes", self.abrir_reportes),
-            ("🚪 Salir", self.salir)
+    def _crear_interfaz(self):
+        """Crea la interfaz principal del dashboard"""
+        # Container principal
+        main_container = ctk.CTkFrame(self.root, fg_color="transparent")
+        main_container.pack(fill="both", expand=True)
+
+        # Sidebar
+        self._crear_sidebar(main_container)
+
+        # Área de contenido
+        self._crear_area_contenido(main_container)
+
+    def _crear_sidebar(self, parent):
+        """Crea la barra lateral de navegación"""
+        self.sidebar = ctk.CTkFrame(
+            parent,
+            width=280,
+            corner_radius=0,
+            fg_color=self.COLORES['sidebar']
+        )
+        self.sidebar.pack(side="left", fill="y")
+        self.sidebar.pack_propagate(False)
+
+        # Header del sidebar
+        self._crear_sidebar_header()
+
+        # Perfil del usuario
+        self._crear_perfil_usuario()
+
+        # Separador
+        ctk.CTkFrame(
+            self.sidebar,
+            height=2,
+            fg_color=self.COLORES['sidebar_active']
+        ).pack(fill="x", padx=20, pady=20)
+
+        # Menú de navegación
+        self._crear_menu_navegacion()
+
+        # Espaciador
+        ctk.CTkFrame(
+            self.sidebar,
+            fg_color="transparent"
+        ).pack(fill="both", expand=True)
+
+        # Botón de salir
+        self._crear_boton_salir()
+
+    def _crear_sidebar_header(self):
+        """Crea el header del sidebar con logo y título"""
+        header = ctk.CTkFrame(self.sidebar, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=(30, 20))
+
+        # Logo
+        ctk.CTkLabel(
+            header,
+            text="🏨",
+            font=("Segoe UI", 40)
+        ).pack()
+
+        # Título
+        ctk.CTkLabel(
+            header,
+            text="HOTEL AMIGUES",
+            font=("Segoe UI", 18, "bold")
+        ).pack(pady=(10, 0))
+
+        # Subtítulo
+        ctk.CTkLabel(
+            header,
+            text="Sistema de Gestión",
+            font=("Segoe UI", 11),
+            text_color=("#BDC3C7", "#95A5A6")
+        ).pack()
+
+    def _crear_perfil_usuario(self):
+        """Crea la sección de perfil del usuario"""
+        perfil = ctk.CTkFrame(
+            self.sidebar,
+            fg_color=("#34495E", "#243342"),
+            corner_radius=12
+        )
+        perfil.pack(fill="x", padx=20, pady=(0, 10))
+
+        # Contenido del perfil
+        content = ctk.CTkFrame(perfil, fg_color="transparent")
+        content.pack(fill="x", padx=15, pady=15)
+
+        # Avatar
+        ctk.CTkLabel(
+            content,
+            text="👤",
+            font=("Segoe UI", 32)
+        ).pack()
+
+        # Nombre
+        ctk.CTkLabel(
+            content,
+            text=f"{self.nombre_empleado} {self.apellido_empleado}",
+            font=("Segoe UI", 13, "bold")
+        ).pack(pady=(8, 5))
+
+        # Puesto
+        ctk.CTkLabel(
+            content,
+            text=self.puesto,
+            font=("Segoe UI", 10),
+            text_color=("#95A5A6", "#7F8C8D")
+        ).pack(pady=(0, 8))
+
+        # Badge de privilegio
+        badge_color = self.COLORES['danger'] if self.privilegio == "Administrador" else self.COLORES['info']
+        badge = ctk.CTkLabel(
+            content,
+            text=self.privilegio,
+            font=("Segoe UI", 9, "bold"),
+            fg_color=badge_color,
+            corner_radius=6,
+            padx=12,
+            pady=4
+        )
+        badge.pack()
+
+    def _crear_menu_navegacion(self):
+        """Crea el menú de navegación"""
+        # Definir elementos del menú
+        menu_items = [
+            {
+                "texto": "Inicio",
+                "icono": "🏠",
+                "comando": self.mostrar_inicio,
+                "permiso": True
+            },
+            {
+                "texto": "Habitaciones",
+                "icono": "🛏️",
+                "comando": self.abrir_habitaciones,
+                "permiso": True
+            },
+            {
+                "texto": "Reservas",
+                "icono": "📅",
+                "comando": self.abrir_reservas,
+                "permiso": True
+            },
+            {
+                "texto": "Huéspedes",
+                "icono": "👥",
+                "comando": self.abrir_huesped,
+                "permiso": True
+            },
+            {
+                "texto": "Empleados",
+                "icono": "💼",
+                "comando": self.abrir_empleados,
+                "permiso": self.privilegio == "Administrador"
+            },
+            {
+                "texto": "Reportes",
+                "icono": "📊",
+                "comando": self.abrir_reportes,
+                "permiso": self.privilegio == "Administrador"
+            },
+            {
+                "texto": "Configuración",
+                "icono": "⚙️",
+                "comando": self.abrir_configuracion,
+                "permiso": self.privilegio == "Administrador"
+            }
         ]
 
-        for texto, comando in botones:
-            btn = tk.Button(self.panel_lateral, text=texto,
-                            command=comando,
-                            bg="#34495e", fg="white",
-                            font=("Arial", 11),
-                            width=20, height=2,
-                            bd=0, cursor="hand2",
-                            activebackground="#1abc9c",
-                            activeforeground="white")
-            btn.pack(pady=5, padx=10)
+        # Crear botones del menú
+        self.botones_menu = {}
+        for item in menu_items:
+            if item["permiso"]:
+                btn = self._crear_boton_menu(
+                    item["texto"],
+                    item["icono"],
+                    item["comando"]
+                )
+                self.botones_menu[item["texto"]] = btn
+
+    def _crear_boton_menu(self, texto, icono, comando):
+        """Crea un botón de menú estilizado"""
+        btn = ctk.CTkButton(
+            self.sidebar,
+            text=f"  {icono}   {texto}",
+            font=("Segoe UI", 13),
+            height=45,
+            corner_radius=10,
+            fg_color="transparent",
+            text_color=("#ECF0F1", "#ECF0F1"),
+            hover_color=self.COLORES['sidebar_hover'],
+            anchor="w",
+            command=lambda: self._activar_boton(texto, comando)
+        )
+        btn.pack(fill="x", padx=15, pady=3)
+        return btn
+
+    def _activar_boton(self, nombre_boton, comando):
+        """Activa visualmente el botón seleccionado"""
+        # Desactivar botón anterior
+        if self.boton_activo and self.boton_activo in self.botones_menu:
+            self.botones_menu[self.boton_activo].configure(
+                fg_color="transparent"
+            )
+
+        # Activar nuevo botón
+        if nombre_boton in self.botones_menu:
+            self.botones_menu[nombre_boton].configure(
+                fg_color=self.COLORES['sidebar_active']
+            )
+            self.boton_activo = nombre_boton
+
+        # Ejecutar comando
+        comando()
+
+    def _crear_boton_salir(self):
+        """Crea el botón de cerrar sesión"""
+        # Separador
+        ctk.CTkFrame(
+            self.sidebar,
+            height=2,
+            fg_color=self.COLORES['sidebar_active']
+        ).pack(fill="x", padx=20, pady=(10, 20))
+
+        # Botón salir
+        ctk.CTkButton(
+            self.sidebar,
+            text="  🚪   Cerrar Sesión",
+            font=("Segoe UI", 13),
+            height=45,
+            corner_radius=10,
+            fg_color=self.COLORES['danger'],
+            hover_color=("#C0392B", "#A93226"),
+            anchor="w",
+            command=self.salir
+        ).pack(fill="x", padx=15, pady=(0, 20))
+
+    def _crear_area_contenido(self, parent):
+        """Crea el área principal de contenido"""
+        self.content_frame = ctk.CTkFrame(
+            parent,
+            fg_color=self.COLORES['content_bg'],
+            corner_radius=0
+        )
+        self.content_frame.pack(side="right", fill="both", expand=True)
+
+        # Frame normal (no scrollable) para el contenido
+        # Las ventanas hijas manejarán su propio scroll si lo necesitan
+        self.area_contenido = ctk.CTkFrame(
+            self.content_frame,
+            fg_color="transparent"
+        )
+        self.area_contenido.pack(fill="both", expand=True, padx=0, pady=0)
 
     def limpiar_area_contenido(self):
+        """Limpia el área de contenido"""
         for widget in self.area_contenido.winfo_children():
             widget.destroy()
 
     def mostrar_inicio(self):
+        """Muestra la pantalla de inicio con estadísticas"""
         self.limpiar_area_contenido()
 
-        # Obtener estadisticas de la db
+        # Container principal con padding
+        container = ctk.CTkFrame(self.area_contenido, fg_color="transparent")
+        container.pack(fill="both", expand=True, padx=30, pady=30)
+
+        # Header
+        self._crear_header_inicio(container)
+
+        # Estadísticas
+        self._crear_cards_estadisticas(container)
+
+        # Información adicional
+        self._crear_info_adicional(container)
+
+    def _crear_header_inicio(self, parent):
+        """Crea el header de la pantalla de inicio"""
+        header = ctk.CTkFrame(parent, fg_color="transparent")
+        header.pack(fill="x", pady=(0, 30))
+
+        # Título
+        ctk.CTkLabel(
+            header,
+            text="📊 Panel de Control",
+            font=("Segoe UI", 32, "bold"),
+            anchor="w"
+        ).pack(anchor="w")
+
+        # Subtítulo
+        ctk.CTkLabel(
+            header,
+            text=f"Bienvenido de vuelta, {self.nombre_empleado}",
+            font=("Segoe UI", 14),
+            text_color=("#7F8C8D", "#95A5A6"),
+            anchor="w"
+        ).pack(anchor="w", pady=(5, 0))
+
+    def _crear_cards_estadisticas(self, parent):
+        """Crea las tarjetas de estadísticas"""
+        # Obtener estadísticas
         stats = self.db.obtener_estadisticas()
 
-        # Info empleado
-        frame_info = tk.Frame(self.area_contenido, bg="#ecf0f1")
-        frame_info.pack(pady=20)
+        # Grid de estadísticas
+        stats_grid = ctk.CTkFrame(parent, fg_color="transparent")
+        stats_grid.pack(fill="x", pady=(0, 30))
 
-        tk.Label(frame_info,
-                 text=f"Bienvenido: {self.nombre_empleado} {self.apellido_empleado} - {self.puesto}",
-                 font= ("Arial", 14, "bold"),
-                 bg="#ecf0f1",).pack()
+        # Configurar columnas
+        for i in range(4):
+            stats_grid.columnconfigure(i, weight=1)
 
-        # Frame para las tarjetas
-        frame_tarjetas = tk.Frame(self.area_contenido, bg="#ecf0f1")
-        frame_tarjetas.pack(expand=True)
-
-        # Tarjetas de resumen
-        tarjetas = [
-            ("Habitaciones\nDisponibles", str(stats['disponibles']), "#27ae60"),
-            ("Habitaciones\nOcupadas", str(stats['ocupadas']), "#e74c3c"),
-            ("En Limpieza", str(stats['limpieza']), "#3498db"),
-            ("Empleados\nActivos", str(stats['empleados']), "#9b59b6")
+        # Definir tarjetas
+        cards_data = [
+            {
+                "titulo": "Disponibles",
+                "valor": stats['disponibles'],
+                "icono": "✅",
+                "color": self.COLORES['success'],
+                "subtitulo": "Habitaciones listas"
+            },
+            {
+                "titulo": "Ocupadas",
+                "valor": stats['ocupadas'],
+                "icono": "🏨",
+                "color": self.COLORES['danger'],
+                "subtitulo": "En uso actualmente"
+            },
+            {
+                "titulo": "En Limpieza",
+                "valor": stats['limpieza'],
+                "icono": "🧹",
+                "color": self.COLORES['warning'],
+                "subtitulo": "En mantenimiento"
+            },
+            {
+                "titulo": "Empleados",
+                "valor": stats['empleados'],
+                "icono": "👥",
+                "color": self.COLORES['info'],
+                "subtitulo": "Personal activo"
+            }
         ]
 
-        for i, (titulo, valor, color) in enumerate(tarjetas):
-            frame_tarjeta = tk.Frame(frame_tarjetas, bg=color,
-                                     width=180, height=150)
-            frame_tarjeta.grid(row=0, column=i, padx=20, pady=50)
-            frame_tarjeta.pack_propagate(False)
+        # Crear tarjetas
+        for i, card_data in enumerate(cards_data):
+            self._crear_tarjeta_stat(stats_grid, card_data, i)
 
-            tk.Label(frame_tarjeta, text=valor,
-                     font=("Arial", 36, "bold"),
-                     bg=color, fg="white").pack(expand=True)
+    def _crear_tarjeta_stat(self, parent, data, column):
+        """Crea una tarjeta de estadística moderna"""
+        # Frame principal de la tarjeta
+        card = ctk.CTkFrame(
+            parent,
+            fg_color=self.COLORES['card_bg'],
+            corner_radius=15
+        )
+        card.grid(row=0, column=column, padx=10, pady=10, sticky="nsew")
 
-            tk.Label(frame_tarjeta, text=titulo,
-                     font=("Arial", 11),
-                     bg=color, fg="white").pack(pady=(0, 10))
+        # Contenido
+        content = ctk.CTkFrame(card, fg_color="transparent")
+        content.pack(fill="both", expand=True, padx=25, pady=25)
 
+        # Header con icono y título
+        header = ctk.CTkFrame(content, fg_color="transparent")
+        header.pack(fill="x", pady=(0, 15))
+
+        # Icono circular
+        icon_frame = ctk.CTkFrame(
+            header,
+            width=50,
+            height=50,
+            fg_color=data['color'],
+            corner_radius=25
+        )
+        icon_frame.pack(side="left")
+        icon_frame.pack_propagate(False)
+
+        ctk.CTkLabel(
+            icon_frame,
+            text=data['icono'],
+            font=("Segoe UI", 24)
+        ).place(relx=0.5, rely=0.5, anchor="center")
+
+        # Título
+        title_frame = ctk.CTkFrame(header, fg_color="transparent")
+        title_frame.pack(side="left", fill="x", expand=True, padx=(15, 0))
+
+        ctk.CTkLabel(
+            title_frame,
+            text=data['titulo'],
+            font=("Segoe UI", 12),
+            text_color=("#7F8C8D", "#95A5A6"),
+            anchor="w"
+        ).pack(anchor="w")
+
+        # Valor grande
+        ctk.CTkLabel(
+            content,
+            text=str(data['valor']),
+            font=("Segoe UI", 42, "bold"),
+            anchor="w"
+        ).pack(anchor="w", pady=(10, 5))
+
+        # Subtítulo
+        ctk.CTkLabel(
+            content,
+            text=data['subtitulo'],
+            font=("Segoe UI", 11),
+            text_color=("#95A5A6", "#7F8C8D"),
+            anchor="w"
+        ).pack(anchor="w")
+
+    def _crear_info_adicional(self, parent):
+        """Crea sección de información adicional"""
+        # Container
+        info_container = ctk.CTkFrame(parent, fg_color="transparent")
+        info_container.pack(fill="both", expand=True)
+
+        # Configurar grid
+        info_container.columnconfigure(0, weight=2)
+        info_container.columnconfigure(1, weight=1)
+
+        # Actividad reciente (izquierda)
+        self._crear_actividad_reciente(info_container)
+
+        # Accesos rápidos (derecha)
+        self._crear_accesos_rapidos(info_container)
+
+    def _crear_actividad_reciente(self, parent):
+        """Crea la sección de actividad reciente"""
+        card = ctk.CTkFrame(
+            parent,
+            fg_color=self.COLORES['card_bg'],
+            corner_radius=15
+        )
+        card.grid(row=0, column=0, padx=(0, 10), sticky="nsew")
+
+        # Header
+        header = ctk.CTkFrame(card, fg_color="transparent")
+        header.pack(fill="x", padx=25, pady=(25, 15))
+
+        ctk.CTkLabel(
+            header,
+            text="📋 Actividad Reciente",
+            font=("Segoe UI", 18, "bold"),
+            anchor="w"
+        ).pack(anchor="w")
+
+        # Lista de actividades (placeholder)
+        activities = [
+            "Nueva reserva registrada - Hab. 101",
+            "Check-out completado - Hab. 205",
+            "Habitación 302 lista para ocupar",
+            "Nueva reserva para fin de semana"
+        ]
+
+        for activity in activities:
+            item = ctk.CTkFrame(card, fg_color="transparent")
+            item.pack(fill="x", padx=25, pady=8)
+
+            ctk.CTkLabel(
+                item,
+                text="•",
+                font=("Segoe UI", 16),
+                text_color=self.COLORES['primary']
+            ).pack(side="left", padx=(0, 10))
+
+            ctk.CTkLabel(
+                item,
+                text=activity,
+                font=("Segoe UI", 11),
+                anchor="w"
+            ).pack(side="left", fill="x", expand=True)
+
+        # Espaciador final
+        ctk.CTkFrame(card, fg_color="transparent", height=15).pack()
+
+    def _crear_accesos_rapidos(self, parent):
+        """Crea la sección de accesos rápidos"""
+        card = ctk.CTkFrame(
+            parent,
+            fg_color=self.COLORES['card_bg'],
+            corner_radius=15
+        )
+        card.grid(row=0, column=1, padx=(10, 0), sticky="nsew")
+
+        # Header
+        header = ctk.CTkFrame(card, fg_color="transparent")
+        header.pack(fill="x", padx=25, pady=(25, 15))
+
+        ctk.CTkLabel(
+            header,
+            text="⚡ Accesos Rápidos",
+            font=("Segoe UI", 18, "bold"),
+            anchor="w"
+        ).pack(anchor="w")
+
+        # Botones de acceso rápido
+        accesos = [
+            ("Nueva Reserva", "📅", self.abrir_reservas),
+            ("Ver Habitaciones", "🛏️", self.abrir_habitaciones),
+            ("Registrar Huésped", "👤", self.abrir_huesped),
+        ]
+
+        for texto, icono, comando in accesos:
+            btn = ctk.CTkButton(
+                card,
+                text=f"{icono}  {texto}",
+                font=("Segoe UI", 12),
+                height=45,
+                corner_radius=10,
+                fg_color="transparent",
+                border_width=2,
+                border_color=("#BDC3C7", "#4A4A4A"),
+                hover_color=self.COLORES['sidebar_hover'],
+                command=comando
+            )
+            btn.pack(fill="x", padx=25, pady=8)
+
+        # Espaciador final
+        ctk.CTkFrame(card, fg_color="transparent", height=15).pack()
+
+    # Métodos para abrir diferentes secciones
     def abrir_habitaciones(self):
         self.limpiar_area_contenido()
-        HabitacionesWindow(self.area_contenido)
+        HabitacionesWindow(self.area_contenido, self.privilegio)
 
     def abrir_empleados(self):
+        if self.privilegio != "Administrador":
+            self.mostrar_acceso_denegado()
+            return
         self.limpiar_area_contenido()
         EmpleadosWindow(self.area_contenido)
 
     def abrir_reservas(self):
         self.limpiar_area_contenido()
-        tk.Label(self.area_contenido, text="Módulo de Reservas",
-                 font=("Arial", 20)).pack(pady=50)
+        ReservasWindow(self.area_contenido, self.privilegio)
 
-    def abrir_mantenimiento(self):
+    def abrir_huesped(self):
         self.limpiar_area_contenido()
-        tk.Label(self.area_contenido, text="Módulo de Mantenimiento",
-                 font=("Arial", 20)).pack(pady=50)
+        HuespedesWindow(self.area_contenido)
 
     def abrir_reportes(self):
+        if self.privilegio != "Administrador":
+            self.mostrar_acceso_denegado()
+            return
         self.limpiar_area_contenido()
-        tk.Label(self.area_contenido, text="Módulo de Reportes",
-                 font=("Arial", 20)).pack(pady=50)
+        self.mostrar_en_desarrollo("Reportes", "📊")
+
+    def abrir_configuracion(self):
+        if self.privilegio != "Administrador":
+            self.mostrar_acceso_denegado()
+            return
+        self.limpiar_area_contenido()
+        self.mostrar_en_desarrollo("Configuración", "⚙️")
+
+    def mostrar_en_desarrollo(self, modulo, icono):
+        """Muestra pantalla de módulo en desarrollo"""
+        container = ctk.CTkFrame(self.area_contenido, fg_color="transparent")
+        container.pack(fill="both", expand=True)
+
+        content = ctk.CTkFrame(container, fg_color="transparent")
+        content.place(relx=0.5, rely=0.5, anchor="center")
+
+        ctk.CTkLabel(
+            content,
+            text=icono,
+            font=("Segoe UI", 80)
+        ).pack(pady=(0, 20))
+
+        ctk.CTkLabel(
+            content,
+            text=f"Módulo de {modulo}",
+            font=("Segoe UI", 28, "bold")
+        ).pack(pady=(0, 10))
+
+        ctk.CTkLabel(
+            content,
+            text="Esta funcionalidad estará disponible próximamente",
+            font=("Segoe UI", 14),
+            text_color=("#7F8C8D", "#95A5A6")
+        ).pack()
+
+    def mostrar_acceso_denegado(self):
+        """Muestra pantalla de acceso denegado"""
+        self.limpiar_area_contenido()
+
+        container = ctk.CTkFrame(self.area_contenido, fg_color="transparent")
+        container.pack(fill="both", expand=True)
+
+        content = ctk.CTkFrame(container, fg_color="transparent")
+        content.place(relx=0.5, rely=0.5, anchor="center")
+
+        ctk.CTkLabel(
+            content,
+            text="🚫",
+            font=("Segoe UI", 80)
+        ).pack(pady=(0, 20))
+
+        ctk.CTkLabel(
+            content,
+            text="ACCESO DENEGADO",
+            font=("Segoe UI", 28, "bold"),
+            text_color=self.COLORES['danger']
+        ).pack(pady=(0, 10))
+
+        ctk.CTkLabel(
+            content,
+            text="No tienes permisos para acceder a esta sección",
+            font=("Segoe UI", 14),
+            text_color=("#7F8C8D", "#95A5A6")
+        ).pack(pady=(0, 5))
+
+        ctk.CTkLabel(
+            content,
+            text="Contacta al administrador del sistema",
+            font=("Segoe UI", 12, "italic"),
+            text_color=("#95A5A6", "#7F8C8D")
+        ).pack()
 
     def salir(self):
-        self.root.quit()
+        """Cierra la sesión"""
+        respuesta = messagebox.askyesno(
+            "Confirmar",
+            "¿Desea cerrar sesión?"
+        )
+        if respuesta:
+            self.db.cerrar()
+            self.root.quit()
+
+    def __del__(self):
+        """Destructor para cerrar conexión a BD"""
+        if hasattr(self, 'db'):
+            try:
+                self.db.cerrar()
+            except Exception:
+                pass

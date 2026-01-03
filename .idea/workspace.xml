@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion">
+    <list default="true" id="d36de272-2143-44ff-a6d6-ab9a906163bc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/gui/huespedes_window.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/db_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/db_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/hotel.db" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/dashboard_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/dashboard_window.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/empleados_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/empleados_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/habitaciones_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/habitaciones_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/login_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/login_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/reservas_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/reservas_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,10 +67,41 @@
     "ai.playground.ignore.import.keys.banner.in.settings": "true",
     "git-widget-placeholder": "master",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "settings.editor.selected.configurable": "proofread",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Hotel-Amigues-Empleados" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -81,7 +117,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767330166426</updated>
-      <workItem from="1767330167438" duration="12462000" />
+      <workItem from="1767330167438" duration="12598000" />
+      <workItem from="1767416479572" duration="5796000" />
+      <workItem from="1767424014776" duration="4993000" />
     </task>
     <task id="LOCAL-00001" summary="Commit">
       <option name="closed" value="true" />
@@ -131,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767341218952</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Implementacion de ventana empleados y su respectiva conexion con la db">
+      <option name="closed" value="true" />
+      <created>1767342745104</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1767342745104</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -142,11 +188,12 @@
     <MESSAGE value="Login y dashboard basico" />
     <MESSAGE value="Creacion de base de datos y implementacion en login y dashboard" />
     <MESSAGE value="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creacion de ventana de habitaciones y implementacion de la conexion de la db para crear, editar, eliminar una habitacion" />
+    <MESSAGE value="Implementacion de ventana empleados y su respectiva conexion con la db" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implementacion de ventana empleados y su respectiva conexion con la db" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$habitaciones_window.coverage" NAME="habitaciones_window Coverage Results" MODIFIED="1767341000122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
-    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767342512295" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$main.coverage" NAME="main Coverage Results" MODIFIED="1767429009852" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$dashboard_window.coverage" NAME="dashboard_window Coverage Results" MODIFIED="1767333854389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
     <SUITE FILE_PATH="coverage/Hotel_Amigues_Empleados$login_window.coverage" NAME="login_window Coverage Results" MODIFIED="1767332918256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
   </component>

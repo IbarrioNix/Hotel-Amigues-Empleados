@@ -18,7 +18,7 @@ class DatabaseManager:
                 numero TEXT UNIQUE NOT NULL,
                 tipo TEXT NOT NULL,
                 precio REAL NOT NULL,
-                estado TEXT DEAULT 'disponible'
+                estado TEXT DEFAULT 'disponible'
             )
         ''')
 
@@ -42,7 +42,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
-                usuario TEXT UNIQUE,
+                telefono TEXT UNIQUE,
                 password TEXT,
                 email TEXT
             )
@@ -56,7 +56,7 @@ class DatabaseManager:
                 habitacion_id INTEGER NOT NULL,
                 fecha_entrada DATE NOT NULL,
                 fecha_salida DATE NOT NULL,
-                estado TEXT DEAULT 'activa',
+                estado TEXT DEFAULT 'activa',
                 total REAL,
                 FOREIGN KEY (huesped_id) REFERENCES huespedes (id),
                 FOREIGN KEY (habitacion_id) REFERENCES habitaciones (id)
@@ -93,6 +93,16 @@ class DatabaseManager:
             self.cursor.execute('''
                                 INSERT INTO empleados (nombre, apellido, puesto, usuario, password, privilegio)
                                 VALUES ('Admin', 'Sistema', 'Gerente', 'admin', '1234', 'Administrador')
+                                ''')
+
+        self.conn.commit()
+
+        # Insertar empleado de prueba (no admin)
+        self.cursor.execute("SELECT COUNT(*) FROM empleados WHERE usuario = 'empleado1'")
+        if self.cursor.fetchone()[0] == 0:
+            self.cursor.execute('''
+                                INSERT INTO empleados (nombre, apellido, puesto, usuario, password, privilegio)
+                                VALUES ('Juan', 'Pérez', 'Recepcionista', 'empleado1', '1234', 'Empleado')
                                 ''')
 
         self.conn.commit()
@@ -230,6 +240,159 @@ class DatabaseManager:
         stats['reservas_activas'] = self.cursor.fetchone()[0]
 
         return stats
+
+    #CRUD Huespedes
+    def obtener_huespedes(self):
+        """Obtiene todos los huéspedes"""
+        self.cursor.execute('SELECT * FROM huespedes')
+        return self.cursor.fetchall()
+
+    def buscar_huesped_por_telefono(self, telefono):
+        """Busca un huésped por su usuario"""
+        self.cursor.execute('SELECT * FROM huespedes WHERE telefono=?', (telefono,))
+        return self.cursor.fetchone()
+
+    def agregar_huesped(self, nombre, apellido, telefono, email='', password=''):
+        """Agrega un nuevo huésped"""
+        try:
+            self.cursor.execute('''
+                                INSERT INTO huespedes (nombre, apellido, telefono, email, password)
+                                VALUES (?, ?, ?, ?, ?)
+                                ''', (nombre, apellido, telefono, email, password))
+            self.conn.commit()
+            return self.cursor.lastrowid  # Devuelve el ID del huésped creado
+        except sqlite3.IntegrityError:
+            return None
+
+    def actualizar_huesped(self, id, nombre, apellido, telefono, email):
+        """Actualiza un huésped"""
+        try:
+            self.cursor.execute('''
+                                UPDATE huespedes
+                                SET nombre=?,
+                                    apellido=?,
+                                    telefono=?,
+                                    email=?
+                                WHERE id = ?
+                                ''', (nombre, apellido, telefono, email, id))
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def eliminar_huesped(self, id):
+        """Elimina un huésped"""
+        self.cursor.execute('DELETE FROM huespedes WHERE id=?', (id,))
+        self.conn.commit()
+
+    # ==================== CRUD para Reservas ====================
+
+    def obtener_reservas(self):
+        """Obtiene todas las reservas con información del huésped y habitación"""
+        self.cursor.execute('''
+                            SELECT r.id,
+                                   r.huesped_id,
+                                   h.nombre || ' ' || h.apellido AS huesped,
+                                   r.habitacion_id,
+                                   hab.numero                    AS habitacion,
+                                   hab.tipo,
+                                   r.fecha_entrada,
+                                   r.fecha_salida,
+                                   r.estado,
+                                   r.total
+                            FROM reservaciones r
+                                     INNER JOIN huespedes h ON r.huesped_id = h.id
+                                     INNER JOIN habitaciones hab ON r.habitacion_id = hab.id
+                            ORDER BY r.fecha_entrada DESC
+                            ''')
+        return self.cursor.fetchall()
+
+    def obtener_reserva_por_id(self, reserva_id):
+        """Obtiene una reserva específica"""
+        self.cursor.execute('SELECT * FROM reservaciones WHERE id=?', (reserva_id,))
+        return self.cursor.fetchone()
+
+    def agregar_reserva(self, huesped_id, habitacion_id, fecha_entrada, fecha_salida, total):
+        """Agrega una nueva reserva"""
+        try:
+            self.cursor.execute('''
+                                INSERT INTO reservaciones (huesped_id, habitacion_id, fecha_entrada, fecha_salida, total, estado)
+                                VALUES (?, ?, ?, ?, ?, 'activa')
+                                ''', (huesped_id, habitacion_id, fecha_entrada, fecha_salida, total))
+
+            # Cambiar estado de la habitación a ocupada
+            self.cambiar_estado_habitacion(habitacion_id, 'ocupada')
+
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error al agregar reserva: {e}")
+            return False
+
+    def actualizar_reserva(self, id, huesped_id, habitacion_id, fecha_entrada, fecha_salida, estado, total):
+        """Actualiza una reserva"""
+        self.cursor.execute('''
+                            UPDATE reservaciones
+                            SET huesped_id=?,
+                                habitacion_id=?,
+                                fecha_entrada=?,
+                                fecha_salida=?,
+                                estado=?,
+                                total=?
+                            WHERE id = ?
+                            ''', (huesped_id, habitacion_id, fecha_entrada, fecha_salida, estado, total, id))
+        self.conn.commit()
+
+    def eliminar_reserva(self, id):
+        """Elimina una reserva"""
+        # Obtener la reserva antes de eliminar
+        reserva = self.obtener_reserva_por_id(id)
+
+        if reserva:
+            habitacion_id = reserva[2]
+
+            # Eliminar la reserva
+            self.cursor.execute('DELETE FROM reservaciones WHERE id=?', (id,))
+
+            # Cambiar estado de la habitación a disponible
+            self.cambiar_estado_habitacion(habitacion_id, 'disponible')
+
+            self.conn.commit()
+
+    def cancelar_reserva(self, id):
+        """Cancela una reserva (cambia estado a cancelada)"""
+        reserva = self.obtener_reserva_por_id(id)
+
+        if reserva:
+            habitacion_id = reserva[2]
+
+            # Cambiar estado de la reserva
+            self.cursor.execute('UPDATE reservaciones SET estado="cancelada" WHERE id=?', (id,))
+
+            # Liberar la habitación
+            self.cambiar_estado_habitacion(habitacion_id, 'disponible')
+
+            self.conn.commit()
+
+    def finalizar_reserva(self, id):
+        """Finaliza una reserva (checkout)"""
+        reserva = self.obtener_reserva_por_id(id)
+
+        if reserva:
+            habitacion_id = reserva[2]
+
+            # Cambiar estado de la reserva
+            self.cursor.execute('UPDATE reservaciones SET estado="finalizada" WHERE id=?', (id,))
+
+            # Cambiar habitación a limpieza
+            self.cambiar_estado_habitacion(habitacion_id, 'limpieza')
+
+            self.conn.commit()
+
+    def obtener_habitaciones_disponibles(self):
+        """Obtiene solo las habitaciones disponibles"""
+        self.cursor.execute("SELECT * FROM habitaciones WHERE estado='disponible'")
+        return self.cursor.fetchall()
 
     def cerrar(self):
         """Cierra la conexión a la base de datos"""
